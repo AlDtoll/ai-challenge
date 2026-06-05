@@ -13,6 +13,7 @@ ai-challenge/
     day2/  ← Response format control
     day3/  ← Reasoning strategies (direct / step-by-step / meta-prompting / experts)
     day4/  ← Temperature comparison (0.0 / 0.7 / 1.2)
+    day5/  ← Model comparison (weak / medium / strong + judge)
     ...
   week2/
     ...
