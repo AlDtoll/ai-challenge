@@ -16,8 +16,6 @@ data class ChatRequest(
 data class Choice(val message: Message, val finish_reason: String)
 data class ChatResponse(val choices: List<Choice>)
 
-val PROMPT = "Что такое корутины в Kotlin? Объясни кратко."
-
 val SYSTEM_PROMPT = """
     Ты — краткий технический эксперт по Android-разработке.
     Отвечай строго по следующему формату:
@@ -34,14 +32,16 @@ fun main() {
     val gson = Gson()
     val client = HttpClient.newHttpClient()
 
-    println("Вопрос: $PROMPT\n")
+    print("You: ")
+    val prompt = readLine()?.trim() ?: return
+    println()
 
     println("═".repeat(60))
     println("БЕЗ ОГРАНИЧЕНИЙ")
     println("═".repeat(60))
     val free = sendRequest(client, gson, apiKey, ChatRequest(
         model = "deepseek-chat",
-        messages = listOf(Message("user", PROMPT))
+        messages = listOf(Message("user", prompt))
     ))
     println(free.choices.first().message.content)
     println("\nfinish_reason: ${free.choices.first().finish_reason}")
@@ -54,7 +54,7 @@ fun main() {
         model = "deepseek-chat",
         messages = listOf(
             Message("system", SYSTEM_PROMPT),
-            Message("user", PROMPT)
+            Message("user", prompt)
         ),
         max_tokens = 150,
         stop = listOf("###END###")
