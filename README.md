@@ -11,6 +11,7 @@ ai-challenge/
   week1/
     day1/  ← First LLM API call (CLI)
     day2/  ← Response format control
+    day3/  ← Reasoning strategies (direct / step-by-step / meta-prompting / experts)
     ...
   week2/
     ...
