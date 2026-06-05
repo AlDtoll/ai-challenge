@@ -1,0 +1,76 @@
+import com.google.gson.Gson
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+
+data class Message(val role: String, val content: String)
+
+data class ChatRequest(
+    val model: String,
+    val messages: List<Message>,
+    val max_tokens: Int? = null,
+    val stop: List<String>? = null
+)
+
+data class Choice(val message: Message, val finish_reason: String)
+data class ChatResponse(val choices: List<Choice>)
+
+val PROMPT = "Что такое корутины в Kotlin? Объясни кратко."
+
+val SYSTEM_PROMPT = """
+    Ты — краткий технический эксперт по Android-разработке.
+    Отвечай строго по следующему формату:
+
+    1. Определение: <одно предложение>
+    2. Ключевая особенность: <одно предложение>
+    3. Пример использования: <одна строка кода>
+
+    ###END###
+""".trimIndent()
+
+fun main() {
+    val apiKey = System.getenv("DEEPSEEK_API_KEY") ?: error("Set DEEPSEEK_API_KEY environment variable")
+    val gson = Gson()
+    val client = HttpClient.newHttpClient()
+
+    println("Вопрос: $PROMPT\n")
+
+    println("═".repeat(60))
+    println("БЕЗ ОГРАНИЧЕНИЙ")
+    println("═".repeat(60))
+    val free = sendRequest(client, gson, apiKey, ChatRequest(
+        model = "deepseek-chat",
+        messages = listOf(Message("user", PROMPT))
+    ))
+    println(free.choices.first().message.content)
+    println("\nfinish_reason: ${free.choices.first().finish_reason}")
+
+    println()
+    println("═".repeat(60))
+    println("С ОГРАНИЧЕНИЯМИ  (system prompt + max_tokens=150 + stop=###END###)")
+    println("═".repeat(60))
+    val controlled = sendRequest(client, gson, apiKey, ChatRequest(
+        model = "deepseek-chat",
+        messages = listOf(
+            Message("system", SYSTEM_PROMPT),
+            Message("user", PROMPT)
+        ),
+        max_tokens = 150,
+        stop = listOf("###END###")
+    ))
+    println(controlled.choices.first().message.content)
+    println("\nfinish_reason: ${controlled.choices.first().finish_reason}")
+}
+
+fun sendRequest(client: HttpClient, gson: Gson, apiKey: String, chatRequest: ChatRequest): ChatResponse {
+    val request = HttpRequest.newBuilder()
+        .uri(URI.create("https://api.deepseek.com/chat/completions"))
+        .header("Authorization", "Bearer $apiKey")
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(chatRequest)))
+        .build()
+
+    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+    return gson.fromJson(response.body(), ChatResponse::class.java)
+}
