@@ -1,21 +1,23 @@
-# Day 2 — Формат ответа
+# Day 2 — Response Format Control
 
-Один и тот же вопрос отправляется дважды:
-- **Без ограничений** — свободный ответ
-- **С ограничениями** — system prompt с форматом + `max_tokens` + `stop sequence`
+The same question is sent twice:
+- **Without constraints** — free response
+- **With constraints** — system prompt with format + `max_tokens` + `stop sequence`
 
-По `finish_reason` видно почему модель остановилась: `stop` = завершила сама, `length` = обрезали по лимиту.
+`finish_reason` shows why the model stopped: `stop` = finished naturally, `length` = cut off by token limit.
 
-## Запуск
+## Setup
 
-### Android Studio
-1. File → Open → `week1/day2`
-2. Run → Edit Configurations → Environment variables: `DEEPSEEK_API_KEY=sk-...`
-3. Запусти `main()`
+Create `.env` in the project root (`ai-challenge/.env`):
+```
+DEEPSEEK_API_KEY=sk-...
+```
 
-### Терминал
+## Run
+
+Open `ai-challenge/` in Android Studio, select `:week1:day2` in Run Configurations and click Run.
+
+Or via terminal:
 ```bash
-export DEEPSEEK_API_KEY=sk-...
-cd week1/day2
-./gradlew run
+./gradlew :week1:day2:run
 ```
