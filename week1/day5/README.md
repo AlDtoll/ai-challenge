@@ -4,7 +4,7 @@ Same prompt, three models + a judge:
 
 | Level | Model | Price |
 |-------|-------|-------|
-| Weak | `meta-llama/llama-3.1-8b-instruct:free` | free |
+| Weak | `meta-llama/llama-4-scout:free` | free |
 | Medium | `meta-llama/llama-3.3-70b-instruct:free` | free |
 | Strong | `deepseek/deepseek-r1:free` | free |
 | Judge | `deepseek/deepseek-r1:free` | free |
