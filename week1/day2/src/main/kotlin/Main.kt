@@ -1,4 +1,5 @@
 import com.google.gson.Gson
+import java.io.File
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -27,8 +28,21 @@ val SYSTEM_PROMPT = """
     ###END###
 """.trimIndent()
 
+fun loadApiKey(): String {
+    System.getenv("DEEPSEEK_API_KEY")?.takeIf { it.isNotBlank() }?.let { return it }
+    var dir = File(".").canonicalFile
+    repeat(5) {
+        val value = File(dir, ".env").takeIf { it.exists() }
+            ?.readLines()?.firstOrNull { it.startsWith("DEEPSEEK_API_KEY=") }
+            ?.substringAfter("=")?.trim()
+        if (!value.isNullOrBlank()) return value
+        dir = dir.parentFile ?: return@repeat
+    }
+    error("Set DEEPSEEK_API_KEY in environment or .env file")
+}
+
 fun main() {
-    val apiKey = System.getenv("DEEPSEEK_API_KEY") ?: error("Set DEEPSEEK_API_KEY environment variable")
+    val apiKey = loadApiKey()
     val gson = Gson()
     val client = HttpClient.newHttpClient()
 
