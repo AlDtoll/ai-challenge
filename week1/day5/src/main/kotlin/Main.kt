@@ -21,9 +21,9 @@ data class Model(
 )
 
 val MODELS = listOf(
-    Model("Слабая  (Llama 8B)",   "meta-llama/llama-3.1-8b-instruct:free",  0.0,  0.0),
-    Model("Средняя (DeepSeek V3)", "deepseek/deepseek-chat",                  0.14, 0.28),
-    Model("Сильная (DeepSeek R1)", "deepseek/deepseek-r1:free",               0.0,  0.0)
+    Model("Слабая  (Llama 3.1 8B)",  "meta-llama/llama-3.1-8b-instruct:free",   0.0, 0.0),
+    Model("Средняя (Llama 3.3 70B)", "meta-llama/llama-3.3-70b-instruct:free",  0.0, 0.0),
+    Model("Сильная (DeepSeek R1)",   "deepseek/deepseek-r1:free",               0.0, 0.0)
 )
 
 fun loadApiKey(): String {

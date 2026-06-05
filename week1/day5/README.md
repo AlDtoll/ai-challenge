@@ -5,7 +5,7 @@ Same prompt, three models + a judge:
 | Level | Model | Price |
 |-------|-------|-------|
 | Weak | `meta-llama/llama-3.1-8b-instruct:free` | free |
-| Medium | `deepseek/deepseek-chat` | $0.14/$0.28 per 1M tokens |
+| Medium | `meta-llama/llama-3.3-70b-instruct:free` | free |
 | Strong | `deepseek/deepseek-r1:free` | free |
 | Judge | `deepseek/deepseek-r1:free` | free |
 
