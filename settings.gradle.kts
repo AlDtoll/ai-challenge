@@ -1,3 +1,3 @@
 rootProject.name = "ai-challenge"
 
-include(":week1:day1", ":week1:day2", ":week1:day3")
+include(":week1:day1", ":week1:day2", ":week1:day3", ":week1:day4")

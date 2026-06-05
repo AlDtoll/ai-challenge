@@ -12,6 +12,7 @@ ai-challenge/
     day1/  ← First LLM API call (CLI)
     day2/  ← Response format control
     day3/  ← Reasoning strategies (direct / step-by-step / meta-prompting / experts)
+    day4/  ← Temperature comparison (0.0 / 0.7 / 1.2)
     ...
   week2/
     ...
