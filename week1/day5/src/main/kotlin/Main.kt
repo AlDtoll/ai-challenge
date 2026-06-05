@@ -110,5 +110,9 @@ fun ask(client: HttpClient, gson: Gson, apiKey: String, modelId: String, prompt:
         .POST(HttpRequest.BodyPublishers.ofString(body))
         .build()
     val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-    return gson.fromJson(response.body(), ChatResponse::class.java)
+    val parsed = gson.fromJson(response.body(), ChatResponse::class.java)
+    if (parsed.choices.isNullOrEmpty()) {
+        error("Empty response from $modelId (HTTP ${response.statusCode()}): ${response.body()}")
+    }
+    return parsed
 }
