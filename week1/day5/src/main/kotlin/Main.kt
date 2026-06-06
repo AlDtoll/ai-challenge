@@ -21,9 +21,9 @@ data class Model(
 )
 
 val MODELS = listOf(
-    Model("Слабая  (Gemma 4 31B)",   "google/gemma-4-31b-it:free",    0.0, 0.0),
-    Model("Средняя (GPT-OSS 120B)",  "openai/gpt-oss-120b:free",      0.0, 0.0),
-    Model("Сильная (DeepSeek R1)",   "deepseek/deepseek-r1:free",     0.0, 0.0)
+    Model("Слабая  (Gemma 4 31B)",      "google/gemma-4-31b-it:free",              0.0, 0.0),
+    Model("Средняя (GPT-OSS 120B)",     "openai/gpt-oss-120b:free",                0.0, 0.0),
+    Model("Сильная (Nemotron 550B)",    "nvidia/nemotron-3-ultra-550b-a55b:free",  0.0, 0.0)
 )
 
 fun loadApiKey(): String {
@@ -83,7 +83,7 @@ fun main() {
     // Судья
     println()
     println("═".repeat(60))
-    println("⚖️  СУДЬЯ (DeepSeek R1 сравнивает ответы)")
+    println("⚖️  СУДЬЯ (Nemotron 550B сравнивает ответы)")
     println("═".repeat(60))
     val judgePrompt = buildString {
         appendLine("Вопрос был: «$prompt»")
@@ -96,7 +96,7 @@ fun main() {
         append("Сравни ответы: точность, полнота, качество. Вынеси краткий вердикт.")
     }
     print("⏳ Запрос судьи...")
-    val judgeResponse = ask(client, gson, apiKey, "deepseek/deepseek-r1:free", judgePrompt)
+    val judgeResponse = ask(client, gson, apiKey, "nvidia/nemotron-3-ultra-550b-a55b:free", judgePrompt)
     print("\r")
     println(judgeResponse.choices.first().message.content)
 }
