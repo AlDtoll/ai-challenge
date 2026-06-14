@@ -3,10 +3,10 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.io.File
 
 private const val DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
 private const val MODEL = "deepseek-chat"
+const val CONTEXT_LIMIT = 64_000
 
 data class Message(val role: String, val content: String)
 private data class ChatRequest(val model: String, val messages: List<Message>)
@@ -25,6 +25,7 @@ class Agent(systemPrompt: String) {
 
     var totalPromptTokens = 0
     var totalCompletionTokens = 0
+    var lastPromptTokens = 0
 
     fun chat(userMessage: String): ChatResult {
         history.add(Message("user", userMessage))
@@ -43,11 +44,24 @@ class Agent(systemPrompt: String) {
         val usage = parsed.usage
 
         history.add(Message("assistant", reply))
+        lastPromptTokens = usage.prompt_tokens
         totalPromptTokens += usage.prompt_tokens
         totalCompletionTokens += usage.completion_tokens
 
         return ChatResult(reply, usage)
     }
 
-    fun historySize() = history.size
+    // Добавляет фейковые сообщения в историю для симуляции большого диалога
+    fun fill(approxTokens: Int) {
+        val wordsPerToken = 0.75
+        val wordCount = (approxTokens * wordsPerToken).toInt()
+        val fakeContent = "слово ".repeat(wordCount).trim()
+        history.add(Message("user", fakeContent))
+        history.add(Message("assistant", "Понял."))
+        lastPromptTokens += approxTokens
+    }
+
+    fun contextFillPercent(): Int = (lastPromptTokens * 100) / CONTEXT_LIMIT
+
+    fun historyMessages() = history.size - 1 // без system
 }

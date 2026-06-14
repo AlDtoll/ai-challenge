@@ -13,12 +13,48 @@ fun loadEnvKey(key: String): String {
     error("Set $key in environment or .env file")
 }
 
+private const val PRICE_PER_M_INPUT = 0.27   // $ за 1M токенов (DeepSeek V3)
+private const val PRICE_PER_M_OUTPUT = 1.10
+
+fun formatCost(inputTokens: Int, outputTokens: Int): String {
+    val cost = (inputTokens / 1_000_000.0) * PRICE_PER_M_INPUT +
+               (outputTokens / 1_000_000.0) * PRICE_PER_M_OUTPUT
+    return "$%.6f".format(cost)
+}
+
+fun printTable(turn: Int, result: ChatResult, agent: Agent) {
+    val fill = agent.contextFillPercent()
+    val fillBar = when {
+        fill >= 100 -> "🔴 OVERFLOW"
+        fill >= 80  -> "🟠 ${fill}%"
+        fill >= 50  -> "🟡 ${fill}%"
+        else        -> "🟢 ${fill}%"
+    }
+    println()
+    println("┌─────────────────────────────────────────────┐")
+    println("│  Ход $turn")
+    println("├──────────────────┬──────────────────────────┤")
+    println("│  Запрос          │  ${result.usage.prompt_tokens} токенов")
+    println("│  Ответ           │  ${result.usage.completion_tokens} токенов")
+    println("│  Итого этот ход  │  ${result.usage.total_tokens} токенов")
+    println("├──────────────────┼──────────────────────────┤")
+    println("│  Всего промптов  │  ${agent.totalPromptTokens}")
+    println("│  Всего ответов   │  ${agent.totalCompletionTokens}")
+    println("│  Стоимость       │  ${formatCost(agent.totalPromptTokens, agent.totalCompletionTokens)}")
+    println("│  Контекст        │  $fillBar / $CONTEXT_LIMIT")
+    println("│  Сообщений       │  ${agent.historyMessages()}")
+    println("└──────────────────┴──────────────────────────┘")
+    println()
+}
+
 fun main() {
     val agent = Agent(
         systemPrompt = "Ты полезный ассистент. Отвечай кратко и по делу на русском языке."
     )
 
-    println("Token counter mode. Type 'exit' to quit.\n")
+    println("Day 8 — Token Counter")
+    println("Команды: /fill <токены> — симулировать большой диалог | exit — выход")
+    println()
 
     var turn = 0
     while (true) {
@@ -27,19 +63,20 @@ fun main() {
         if (input.equals("exit", ignoreCase = true)) break
         if (input.isBlank()) continue
 
+        if (input.startsWith("/fill")) {
+            val tokens = input.removePrefix("/fill").trim().toIntOrNull() ?: 10_000
+            agent.fill(tokens)
+            println(">>> Добавлено ~$tokens токенов в историю. Контекст: ${agent.contextFillPercent()}%")
+            continue
+        }
+
         turn++
         val result = agent.chat(input)
+        println("\nAgent: ${result.reply}")
+        printTable(turn, result, agent)
 
-        println("Agent: ${result.reply}\n")
-        println("--- Turn $turn tokens ---")
-        println("  Request (prompt):    ${result.usage.prompt_tokens}")
-        println("  Response (completion): ${result.usage.completion_tokens}")
-        println("  Total this turn:     ${result.usage.total_tokens}")
-        println("--- Cumulative ---")
-        println("  Prompt tokens total:     ${agent.totalPromptTokens}")
-        println("  Completion tokens total: ${agent.totalCompletionTokens}")
-        println("  Grand total:             ${agent.totalPromptTokens + agent.totalCompletionTokens}")
-        println("  Messages in history:     ${agent.historySize()}")
-        println()
+        if (agent.contextFillPercent() >= 100) {
+            println("⛔ КОНТЕКСТ ПЕРЕПОЛНЕН! Следующий запрос вернёт ошибку от API.")
+        }
     }
 }
