@@ -71,12 +71,20 @@ fun main() {
         }
 
         turn++
-        val result = agent.chat(input)
-        println("\nAgent: ${result.reply}")
-        printTable(turn, result, agent)
+        try {
+            val result = agent.chat(input)
+            println("\nAgent: ${result.reply}")
+            printTable(turn, result, agent)
 
-        if (agent.contextFillPercent() >= 100) {
-            println("⛔ КОНТЕКСТ ПЕРЕПОЛНЕН! Следующий запрос вернёт ошибку от API.")
+            if (agent.contextFillPercent() >= 100) {
+                println("⛔ КОНТЕКСТ ПЕРЕПОЛНЕН! Следующий запрос вернёт ошибку от API.")
+            }
+        } catch (e: Exception) {
+            println()
+            println("⛔ ОШИБКА API: ${e.message}")
+            println("   Контекст переполнен — модель не может обработать такой длинный диалог.")
+            println("   Используй /fill меньшее значение или начни новый сеанс.")
+            println()
         }
     }
 }
