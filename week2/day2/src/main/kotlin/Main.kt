@@ -43,7 +43,7 @@ fun main() {
             val input = readLine()?.trim() ?: break
             if (input.equals("exit", ignoreCase = true)) break
             if (input.isBlank()) continue
-            val reply = agent.chat(input)
+            val reply = agent.chat(chatId = 0L, userMessage = input)
             println("Agent: $reply\n")
         }
     }
