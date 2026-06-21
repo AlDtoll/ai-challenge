@@ -64,8 +64,8 @@ fun main() {
             else -> {
                 try {
                     val systemPrompt = SystemPromptBuilder.build(manager.profile)
-                    val (reply, usage) = llm.chat(systemPrompt, history)
                     history.add(Message("user", input))
+                    val (reply, usage) = llm.chat(systemPrompt, history)
                     history.add(Message("assistant", reply))
 
                     println("\nAgent: $reply")
