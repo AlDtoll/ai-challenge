@@ -156,8 +156,13 @@ private fun handleUserMessage(input: String, m: TaskMachine, llm: LlmClient, his
 }
 
 private fun parseNumberedList(text: String): List<String> {
-    val re = Regex("""^\s*\d+[.)]\s+(.+)$""", RegexOption.MULTILINE)
-    return re.findAll(text).map { it.groupValues[1].trim() }.toList()
+    // Ловим и нумерованные "1. / 1)", и markdown-списки "- / * / •", включая чеклисты "- [ ]".
+    // Модель часто отдаёт план не строго цифрами — иначе draftPlan оставался пустым и блокировал переход.
+    val re = Regex("""^\s*(?:\d+[.)]|[-*•]\s*(?:\[.?\])?)\s+(.+)$""", RegexOption.MULTILINE)
+    return re.findAll(text)
+        .map { it.groupValues[1].trim() }
+        .filter { it.length > 1 }
+        .toList()
 }
 
 // ─── Печать ─────────────────────────────────────────────────────
@@ -245,6 +250,13 @@ fun buildSystemPrompt(m: TaskMachine): String = buildString {
                 appendLine("План:")
                 s.draftPlan.forEachIndexed { i, st -> appendLine("  ${i + 1}. $st") }
             }
+            if (s.step == PlanningStep.DRAFT_PLAN) {
+                appendLine()
+                appendLine("Сейчас шаг DRAFT_PLAN. Выдай ТОЛЬКО нумерованный план из 3–5 пунктов, строго в формате:")
+                appendLine("1. ...")
+                appendLine("2. ...")
+                appendLine("Без markdown-заголовков, без чеклистов, без кода и пояснений — только список.")
+            }
         }
         is TaskState.Execution -> {
             appendLine("План:")
@@ -259,5 +271,10 @@ fun buildSystemPrompt(m: TaskMachine): String = buildString {
         TaskState.Done -> appendLine("Задача завершена.")
     }
     appendLine()
-    appendLine("Действуй строго в рамках текущего стейджа. Не предлагай переходов, которые гейты не позволяют.")
+    appendLine("ЖЁСТКИЕ ПРАВИЛА:")
+    appendLine("- Стейджами, переходами и гейтами управляет ТОЛЬКО система по командам пользователя.")
+    appendLine("- НЕ объявляй смену стейджа ('Переход в EXECUTION/VALIDATION'), НЕ пиши 'ФИНАЛЬНЫЙ СТЕЙДЖ',")
+    appendLine("  НЕ выставляй гейты сам и не выдумывай статусы вроде executionComplete=true / DONE.")
+    appendLine("- Работай строго в рамках ТЕКУЩЕГО стейджа, указанного выше, и не забегай вперёд.")
+    appendLine("- Не предлагай переходов, которые гейты не позволяют.")
 }
