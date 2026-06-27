@@ -7,10 +7,12 @@
 
 ## ШАГ 1 — запуск
 
-Печатаю:
+Печатаю (Windows PowerShell; chcp 65001 — чтобы русские буквы не были кракозябрами):
 ```
-./gradlew :week4:day2:run --console=plain -q
+chcp 65001
+.\gradlew.bat :week4:day2:run --console=plain -q
 ```
+(на Linux/Mac: `./gradlew :week4:day2:run --console=plain -q`)
 
 Получаю:
 ```
