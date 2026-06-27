@@ -24,4 +24,13 @@ dependencies {
 
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
+    // Принудительно UTF-8 для вывода — иначе на Windows кириллица в консоли = кракозябры
+    // (JVM по умолчанию пишет в cp1251). В паре с `chcp 65001` даёт нормальный русский.
+    jvmArgs(
+        "-Dfile.encoding=UTF-8",
+        "-Dstdout.encoding=UTF-8",
+        "-Dstderr.encoding=UTF-8",
+        "-Dsun.stdout.encoding=UTF-8",
+        "-Dsun.stderr.encoding=UTF-8",
+    )
 }
