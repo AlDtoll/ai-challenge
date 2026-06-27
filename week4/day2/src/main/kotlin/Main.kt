@@ -34,7 +34,7 @@ import kotlinx.serialization.json.putJsonObject
 private const val PORT = 3001
 private const val MCP_URL = "http://localhost:$PORT/mcp"
 
-fun main() = runBlocking {
+fun main() = runBlocking<Unit> {
     // HTTP-клиент для запросов к Open-Meteo внутри инструмента.
     val apiHttp = HttpClient(ClientCIO)
 
