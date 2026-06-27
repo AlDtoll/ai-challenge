@@ -57,8 +57,8 @@ fun main() = runBlocking<Unit> {
             required = listOf("latitude", "longitude"),
         ),
     ) { request ->
-        val lat = request.arguments["latitude"]?.jsonPrimitive?.doubleOrNull
-        val lon = request.arguments["longitude"]?.jsonPrimitive?.doubleOrNull
+        val lat = request.arguments?.get("latitude")?.jsonPrimitive?.doubleOrNull
+        val lon = request.arguments?.get("longitude")?.jsonPrimitive?.doubleOrNull
         if (lat == null || lon == null) {
             CallToolResult(content = listOf(TextContent("нужны числовые latitude и longitude")), isError = true)
         } else {
