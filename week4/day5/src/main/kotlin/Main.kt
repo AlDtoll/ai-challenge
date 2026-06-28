@@ -123,7 +123,7 @@ fun main(args: Array<String>) = runBlocking<Unit> {
             val schema = t.inputSchema
             val params = buildJsonObject {
                 put("type", "object")
-                put("properties", schema.properties)
+                put("properties", schema.properties ?: buildJsonObject { })
                 schema.required?.let { req -> put("required", JsonArray(req.map { JsonPrimitive(it) })) }
             }
             registry += ToolEntry("${key}__${t.name}", key, mcp, t.name, t.description ?: "", params)
