@@ -6,3 +6,4 @@ include(":week3:day1", ":week3:day2", ":week3:day3", ":week3:day4", ":week3:day5
 include(":week4:day1")
 include(":week4:day2")
 include(":week4:day3")
+include(":week4:day4")
