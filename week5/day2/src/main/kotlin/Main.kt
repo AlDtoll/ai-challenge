@@ -54,7 +54,7 @@ private val http: HttpClient = HttpClient.newBuilder()
 
 private val gson = Gson()
 
-fun ollamaEmbed(text: String): FloatArray {
+fun ollamaEmbedRaw(text: String): FloatArray {
     val body = gson.toJson(mapOf("model" to OLLAMA_MODEL, "prompt" to text))
     val req = HttpRequest.newBuilder(URI.create(OLLAMA_URL))
         .timeout(Duration.ofSeconds(60))
@@ -70,6 +70,15 @@ fun ollamaEmbed(text: String): FloatArray {
         ?: error("Ollama ответ без поля 'embedding': ${res.body().take(300)}")
     return FloatArray(arr.size()) { arr[it].asFloat }
 }
+
+/** nomic-embed-text ожидает task-префиксы: `search_document:` для чанков, `search_query:` для вопросов.
+ *  Официальный best practice: даёт ~5-15% прирост recall@k. Пропущенный префикс — самая частая
+ *  ошибка ранних RAG-имплементаций. Если модель не nomic-семейства — префикс не добавляем. */
+fun embedDocument(text: String): FloatArray =
+    ollamaEmbedRaw(if (OLLAMA_MODEL.contains("nomic")) "search_document: $text" else text)
+
+fun embedQuery(text: String): FloatArray =
+    ollamaEmbedRaw(if (OLLAMA_MODEL.contains("nomic")) "search_query: $text" else text)
 
 // ==================== Чанкер (по абзацам, с укрупнением) ====================
 
@@ -258,7 +267,7 @@ fun askNoRag(question: String): Answer {
 }
 
 fun askWithRag(question: String, idx: Index, k: Int = 3): Answer {
-    val qEmb = ollamaEmbed(question)
+    val qEmb = embedQuery(question)
     val hits = topK(qEmb, idx.chunks, k)
     val ctx = hits.joinToString("\n\n---\n\n") { "[источник: ${it.chunk.source}, cos=${"%.3f".format(it.score)}]\n${it.chunk.text}" }
     val txt = deepseek(systemWithRag(ctx), question)
@@ -328,7 +337,7 @@ fun buildIndex(): Index {
         val parts = chunkParagraphs(text)
         for ((i, p) in parts.withIndex()) {
             print("\rЭмбединг: ${chunks.size + 1}  (файл $name, чанк $i)          ")
-            val emb = ollamaEmbed(p)
+            val emb = embedDocument(p)
             if (dim < 0) dim = emb.size
             require(emb.size == dim) { "Ollama вернул разную размерность: было $dim, стало ${emb.size}" }
             chunks += Chunk(text = p, source = name, chunkId = i, embedding = emb)

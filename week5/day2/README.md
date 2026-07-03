@@ -52,7 +52,7 @@ Remove-Item $env:USERPROFILE\.ai-challenge\day22_index.json -ErrorAction Silentl
 `Main.kt` содержит всё:
 
 - `chunkParagraphs()` — режем MD по абзацам, склеиваем короткие, режем длинные до 700 символов с overlap 100.
-- `ollamaEmbed()` — POST на `http://localhost:11434/api/embeddings`, возвращает `FloatArray(768)`.
+- `ollamaEmbedRaw()` / `embedDocument()` / `embedQuery()` — POST на `http://localhost:11434/api/embeddings`, `FloatArray(768)`. Для `nomic-embed-text` перед текстом ставится task-префикс: `search_document:` для чанков базы, `search_query:` для вопросов пользователя — это официальный best practice от Nomic, даёт ~5-15% прирост recall@k.
 - `cosine()` + `topK()` — in-memory ретривер.
 - `deepseek()` — POST на `https://api.deepseek.com/chat/completions` (`deepseek-chat`).
 - `askNoRag()` / `askWithRag()` — два режима.
