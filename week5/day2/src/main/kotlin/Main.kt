@@ -365,6 +365,8 @@ fun ensureIndex(): Index {
 
 fun printHelp() {
     println("""Использование:
+  (без флагов)                             — интерактивный режим: вводишь вопрос,
+                                             печатается ответ БЕЗ RAG и С RAG рядом
   --build                                  — построить индекс (эмбеддинги через Ollama)
   --ask "вопрос"                           — ответ БЕЗ RAG
   --ask "вопрос" --rag                     — ответ С RAG (загружает индекс или строит если нет)
@@ -373,10 +375,34 @@ fun printHelp() {
 """)
 }
 
+fun runRepl() {
+    val idx = ensureIndex()
+    println("\nИнтерактивный режим RAG. Введи вопрос и нажми Enter.")
+    println("Пустая строка / Ctrl+C — выход.\n")
+    while (true) {
+        print("> ")
+        System.out.flush()
+        val q = readlnOrNull()?.trim() ?: break
+        if (q.isEmpty()) break
+
+        println("\n--- БЕЗ RAG ---")
+        val noRag = askNoRag(q)
+        println(noRag.text)
+
+        println("\n--- С RAG ---")
+        val withRag = askWithRag(q, idx)
+        println(withRag.text)
+        println("\nОткуда взял: топ-${withRag.hits.size} чанков ->")
+        for (h in withRag.hits) println("  ${h.chunk.source}#${h.chunk.chunkId}  cos=${"%.3f".format(h.score)}")
+        println()
+    }
+    println("Пока.")
+}
+
 fun main(args: Array<String>) {
     val list = args.toList()
     when {
-        list.isEmpty() || "--help" in list -> printHelp()
+        "--help" in list -> printHelp()
         "--build" in list -> buildIndex()
         "--compare" in list -> runCompare(ensureIndex())
         "--ask" in list -> {
@@ -396,6 +422,6 @@ fun main(args: Array<String>) {
                 println(a.text)
             }
         }
-        else -> printHelp()
+        else -> runRepl()
     }
 }
