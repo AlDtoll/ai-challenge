@@ -395,7 +395,7 @@ fun rerankLLM(question: String, candidates: List<Hit>): List<Pair<Hit, Float>> {
         return candidates.map { it to 0.5f }
     }
     val scores = parseRerankScores(raw, candidates.size)
-    return candidates.zip(scores) { h, s -> h to s }
+    return candidates.mapIndexed { i, h -> h to scores[i] }
 }
 
 /** Парсит плоский массив чисел из ответа модели. Regex-fallback + padding до `expected`
