@@ -114,23 +114,26 @@ data class Chunk(
 }
 
 // Простой fixed-size chunker с overlap.
+// Гарантирует прогресс: шаг i = size - overlap (независимо от того, срезали по \n\n или нет).
+// Иначе бесконечный цикл, когда cut.length <= overlap (маленький последний piece или удачный lastNL).
 fun chunkMarkdown(text: String, size: Int = 800, overlap: Int = 150): List<String> {
     val cleaned = text.trim()
     if (cleaned.length <= size) return listOf(cleaned)
+    val step = (size - overlap).coerceAtLeast(1)  // минимум +1 char за итерацию — защита от бесконечного цикла
     val out = mutableListOf<String>()
     var i = 0
     while (i < cleaned.length) {
         val end = (i + size).coerceAtMost(cleaned.length)
-        val piece = cleaned.substring(i, end)
-        // Постараемся резать по абзацу если рядом
-        var cut = piece
+        var piece = cleaned.substring(i, end)
+        // Постараемся резать по абзацу если рядом — сохраним семантику,
+        // но шаг i это не меняет (см. выше).
         if (end < cleaned.length) {
             val lastNL = piece.lastIndexOf("\n\n")
-            if (lastNL > size - 200) cut = piece.substring(0, lastNL)
+            if (lastNL > size - 200) piece = piece.substring(0, lastNL)
         }
-        out.add(cut.trim())
-        i += cut.length - overlap
-        if (i <= 0) i = size
+        out.add(piece.trim())
+        if (end >= cleaned.length) break
+        i += step
     }
     return out.filter { it.isNotBlank() }
 }
