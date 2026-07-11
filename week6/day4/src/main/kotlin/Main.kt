@@ -282,15 +282,18 @@ fun buildPrompt(style: PromptStyle, question: String, hits: List<Pair<Chunk, Dou
 
 /* ---------- Verbatim + parse_failure ---------- */
 
+// verbatim по 4-граммам (вместо 8): чувствительнее к коротким ответам.
+// 8-граммы почти всегда 0 для ответов 30-60 токенов (~5-10 слов).
 fun verbatimRate(answer: String, contextChunks: List<Chunk>): Double {
     val normalize = { s: String -> s.replace(Regex("\\s+"), " ").trim().lowercase() }
     val ans = normalize(answer)
     val ctx = normalize(contextChunks.joinToString(" ") { it.text })
     val words = ans.split(" ").filter { it.isNotBlank() }
-    if (words.size < 8) return 0.0
+    val N = 4
+    if (words.size < N) return 0.0
     var matched = 0; var total = 0
-    for (i in 0..(words.size - 8)) {
-        val ng = words.subList(i, i + 8).joinToString(" ")
+    for (i in 0..(words.size - N)) {
+        val ng = words.subList(i, i + N).joinToString(" ")
         total++
         if (ctx.contains(ng)) matched++
     }
@@ -299,13 +302,16 @@ fun verbatimRate(answer: String, contextChunks: List<Chunk>): Double {
 
 // Проверка сбоя формата: должен быть хотя бы один [S1..Sk] маркер + не оборван.
 // «Оборван» = ответ обрывается посреди слова / открытая скобка / незакрытая пара кавычек.
+// parse_fail = формат ответа не соответствует ожидаемому.
+// Строгий критерий: НЕТ маркера [Sn] И не «Недостаточно контекста.»
+// Проверка на «оборван» удалена — давала ложные срабатывания на нормальных
+// коротких ответах OPTIMIZED (модель могла закончить не точкой из-за стоп-слов).
 fun parseFailure(answer: String, expectedSources: Int = 3): Boolean {
     val hasMarker = Regex("\\[S[1-9]\\d?\\]").containsMatchIn(answer)
-    val looksTruncated = answer.trim().let {
-        it.length > 20 && !it.last().let { c -> c in ".!?)»\"']" } &&
-        !it.endsWith("Недостаточно контекста.")
+    val isRefusal = answer.trim().let {
+        it.contains("Недостаточно контекста", ignoreCase = true) || it.contains("insufficient_context", ignoreCase = true)
     }
-    return !hasMarker || looksTruncated
+    return !hasMarker && !isRefusal
 }
 
 /* ---------- Turn ---------- */
@@ -511,13 +517,23 @@ fun repl(s0: Session?) {
                     val questions = try { loadEvalQuestions(path) } catch (t: Throwable) { println("Ошибка: ${t.message}"); continue }
                     if (allPresets) {
                         println("Eval --presets: ${questions.size} вопросов × ${PRESETS.size} пресетов")
+                        println("(порядок оптимизирован по модели: все пресеты с той же моделью подряд,")
+                        println(" чтобы не свопать Q4↔Q3 15 раз при 6 GB VRAM)")
                         val byPreset = linkedMapOf<String, MutableList<Turn>>()
                         PRESETS.values.forEach { byPreset[it.name] = mutableListOf() }
-                        questions.forEach { q ->
-                            val hits = s.retrieve(q)
-                            PRESETS.values.forEach { p ->
-                                val t = s.askOn(p, q, hits, updateHistory = false)
-                                byPreset[p.name]!!.add(t)
+                        // Кэшируем retrieval-хиты для каждого вопроса — retrieval стабилен, экономим embed-вызовы.
+                        val questionHits = questions.map { it to s.retrieve(it) }
+                        // Группируем: сначала все пресеты с моделью M1 (baseline+optimized оба на Q4), потом M2 (quant на Q3).
+                        val presetsByModel = PRESETS.values.groupBy { it.model }
+                        var groupIdx = 0
+                        presetsByModel.forEach { (model, presetGroup) ->
+                            groupIdx++
+                            println("  [$groupIdx/${presetsByModel.size}] группа модели $model (${presetGroup.map { it.name }.joinToString("+")})…")
+                            presetGroup.forEach { p ->
+                                questionHits.forEach { (q, hits) ->
+                                    val t = s.askOn(p, q, hits, updateHistory = false)
+                                    byPreset[p.name]!!.add(t)
+                                }
                             }
                         }
                         printEvalPresetsTable(byPreset)
