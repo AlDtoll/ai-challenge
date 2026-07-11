@@ -32,14 +32,14 @@
 
 Окно A:
 ```powershell
-.\gradlew.bat :week6:day2:run --console=plain -q --args="ingest ../docs"
+.\gradlew.bat :week6:day2:run --console=plain -q --args="ingest ../../docs"
 ```
 
 Ожидаемый вывод:
 ```
 Health-check…
   chat=qwen2.5:7b, embed=nomic-embed-text. Всего моделей: 3
-Ingest: '../docs' → 8 файлов
+Ingest: '../../docs' → 8 файлов
   [1/8] week5/day23_research.md — 12 чанков
   [2/8] week5/day24_research.md — 10 чанков
   ...

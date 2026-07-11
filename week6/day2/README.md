@@ -64,7 +64,7 @@ $env:JAVA_HOME = "C:\Program Files\Android\Android Studio2\jbr"
 $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
 
 # 1. Индексация папки с документами (первый раз)
-.\gradlew.bat :week6:day2:run --console=plain -q --args="ingest ../docs"
+.\gradlew.bat :week6:day2:run --console=plain -q --args="ingest ../../docs"
 
 # 2. Запуск чата (потом просто без флагов — index.json подхватится сам)
 .\gradlew.bat :week6:day2:run --console=plain -q
@@ -117,7 +117,7 @@ eval_duration в наносекундах (÷ 1e9 → мс) для tok/s.
 
 | Действие | Время |
 |---|---|
-| `ingest ../docs` (5 файлов, 47 чанков) | 15-20 с (~350 ms/чанк на nomic-embed) |
+| `ingest ../../docs` (5 файлов, 47 чанков) | 15-20 с (~350 ms/чанк на nomic-embed) |
 | Один turn (embed + chat) | 1-2 с (embed 100-200 ms, chat 800-1500 ms) |
 | Throughput chat | 40-45 tok/s (qwen2.5:7b на RTX 3060) |
 
