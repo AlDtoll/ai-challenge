@@ -36,8 +36,11 @@ class OllamaClient(
     fun healthCheck(): List<String> {
         val tags = JsonParser.parseString(get("/api/tags")).asJsonObject
         val models = tags.getAsJsonArray("models").map { it.asJsonObject["name"].asString }
-        require(chatModel in models) { "модель '$chatModel' не установлена. ollama pull $chatModel" }
-        require(embedModel in models) { "модель '$embedModel' не установлена. ollama pull $embedModel" }
+        // Ollama возвращает имена с :tag (обычно :latest), а пользователь мог указать
+        // модель без тега — считаем что "nomic-embed-text" == "nomic-embed-text:latest".
+        fun isInstalled(name: String) = models.any { it == name || it == "$name:latest" || it.startsWith("$name:") }
+        require(isInstalled(chatModel)) { "модель '$chatModel' не установлена. ollama pull $chatModel. Установлено: $models" }
+        require(isInstalled(embedModel)) { "модель '$embedModel' не установлена. ollama pull $embedModel. Установлено: $models" }
         return models
     }
 
