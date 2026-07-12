@@ -135,9 +135,8 @@ class OllamaClient(private val cfg: Config) {
         val res = http.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
         if (res.statusCode() != 200) return emptyList()
         val json = gson.fromJson(res.body(), JsonObject::class.java)
-        return json.getAsJsonArray("models").orEmpty().mapNotNull {
-            it.asJsonObject.get("name")?.asString
-        }
+        val arr = json.getAsJsonArray("models") ?: return emptyList()
+        return arr.mapNotNull { it.asJsonObject.get("name")?.asString }
     }
 
     fun ping(): Boolean = try { tags().isNotEmpty() } catch (_: Exception) { false }
