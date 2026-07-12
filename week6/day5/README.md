@@ -17,6 +17,7 @@ HTTP-сервис на **`com.sun.net.httpserver.HttpServer`** (JDK stdlib, но
 
 | Method + Path | Auth | Rate | Concurrency | Что делает |
 |---|---|---|---|---|
+| `GET /` | нет | нет | нет | HTML чат-UI (браузер, встроен из `resources/chat.html`) |
 | `GET /health` | нет | нет | нет | Живой ли сервис + Ollama up + сколько чанков в индексе |
 | `POST /v1/chat` | ✅ | ✅ | ✅ | Чат: `{messages:[{role,content}], temperature?, max_tokens?}` |
 | `POST /v1/rag` | ✅ | ✅ | ✅ | RAG над индексом day26-28: `{question, k?}` |
@@ -115,12 +116,25 @@ done | sort | uniq -c
 # должно быть N × 200 + M × 429
 ```
 
+## Веб-чат
+
+Открой в браузере: `http://localhost:7788/`
+
+Простой чат-UI (HTML+JS, без зависимостей):
+- Переключатель **RAG (по докам)** ↔ **Chat (свободный)**.
+- Поле API-ключа сохраняется в `localStorage`.
+- Показ ответа с sources+similarity и метриками (`wall_ms`, `tokens_out`).
+- Работает и с ПК, и с телефона в той же WiFi.
+
 ## Проверка «доступа по сети»
 
 **С другой машины в LAN** (телефон, ноут):
 ```bash
 # найти LAN-IP компьютера, где крутится сервис (Windows: `ipconfig | findstr IPv4`)
 curl http://192.168.1.42:7788/health
+
+# или сразу открой чат в браузере телефона:
+# http://192.168.1.42:7788/
 ```
 
 **Если хочется публично (VPS)** — под nginx/Caddy как reverse-proxy на порту 8443 (не 443 — там AmneziaVPN). `X-Forwarded-For` уже правильно резолвится в `resolveClientIp()`.

@@ -379,6 +379,28 @@ class ConcurrencyFilter(private val sem: Semaphore, private val timeoutSec: Long
 // Handlers
 // =====================================================================
 
+class IndexHandler : HttpHandler {
+    private val html: String by lazy {
+        this::class.java.getResourceAsStream("/chat.html")?.use {
+            it.readBytes().toString(Charsets.UTF_8)
+        } ?: "<!doctype html><h1>chat.html not found in classpath</h1>"
+    }
+    override fun handle(x: HttpExchange) {
+        val path = x.requestURI.path
+        if (path != "/" && path != "/index.html") {
+            sendError(x, 404, "not_found", "No such endpoint: $path"); return
+        }
+        if (x.requestMethod != "GET") { sendError(x, 405, "method_not_allowed", "Use GET"); return }
+        val bytes = html.toByteArray(Charsets.UTF_8)
+        x.responseHeaders.set("Content-Type", "text/html; charset=utf-8")
+        x.responseHeaders.set("Cache-Control", "no-store")
+        x.sendResponseHeaders(200, bytes.size.toLong())
+        x.responseBody.use { it.write(bytes) }
+        Stats.totalRequests.incrementAndGet()
+        Stats.ok.incrementAndGet()
+    }
+}
+
 class HealthHandler(
     private val cfg: Config,
     private val ollama: OllamaClient,
@@ -536,6 +558,7 @@ fun buildServer(cfg: Config, ollama: OllamaClient, initialChunks: List<Chunk>): 
     val server = HttpServer.create(InetSocketAddress(cfg.port), 0)
     server.executor = Executors.newFixedThreadPool(maxOf(4, cfg.maxConcurrent + 2))
 
+    server.createContext("/", IndexHandler())
     server.createContext("/health", HealthHandler(cfg, ollama, chunksCountProvider))
 
     server.createContext("/stats", StatsHandler()).apply {
@@ -722,7 +745,8 @@ fun main(args: Array<String>) {
         val handle = buildServer(cfg, ollama, chunks)
         handle.server.start()
         println("Serving on http://0.0.0.0:${cfg.port}")
-        println("Endpoints: GET /health, POST /v1/chat, POST /v1/rag, GET /stats (auth)")
+        println("  UI:        GET /                (chat UI in browser)")
+        println("  Endpoints: GET /health, POST /v1/chat, POST /v1/rag, GET /stats (auth)")
         println("Ctrl+C to stop.")
         Runtime.getRuntime().addShutdownHook(Thread { handle.server.stop(1) })
         Thread.currentThread().join()
