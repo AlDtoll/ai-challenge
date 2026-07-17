@@ -67,15 +67,39 @@ fun buildGitMcpServer(projectDir: File): Server {
     return server
 }
 
-/** Запуск git-команды в заданном каталоге. Возвращает stdout (trimmed). */
+/**
+ * Запуск git-команды в заданном каталоге. Возвращает stdout (trimmed).
+ *
+ * Важно: stdout читаем в фоновом потоке ПАРАЛЛЕЛЬНО с waitFor() —
+ * иначе на большом выхлопе (`git log`, `git diff`) буфер пайпа переполняется
+ * и процесс блокируется на write, а мы — на waitFor. Классический deadlock.
+ *
+ * Плюс cap 64 KB на всю выдачу — защита от переполнения LLM-контекста.
+ */
 private fun runGit(dir: File, vararg args: String): String {
     val pb = ProcessBuilder(listOf("git") + args.toList())
         .directory(dir)
         .redirectErrorStream(true)
     val proc = pb.start()
-    val output = proc.inputStream.bufferedReader(Charsets.UTF_8).readText()
+    val output = StringBuilder()
+    val cap = 64 * 1024
+    val reader = Thread {
+        proc.inputStream.bufferedReader(Charsets.UTF_8).use { br ->
+            val buf = CharArray(4096)
+            while (true) {
+                val n = br.read(buf)
+                if (n < 0) break
+                if (output.length < cap) {
+                    val room = cap - output.length
+                    output.append(buf, 0, minOf(n, room))
+                    if (output.length >= cap) output.append("\n… [обрезано на 64 KB]")
+                }
+            }
+        }
+    }.apply { isDaemon = true; start() }
     val ok = proc.waitFor()
-    return if (ok == 0) output.trim() else "git error (exit=$ok): $output".trim()
+    reader.join(1000)
+    return if (ok == 0) output.toString().trim() else "git error (exit=$ok): ${output.toString().trim()}"
 }
 
 /** Поднимает MCP-сервер на порту, не блокирует. Возвращает handle для stop(). */
