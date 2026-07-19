@@ -1,0 +1,54 @@
+{
+  "questions": [
+    {
+      "q": "Куда мы мержим ветки дней в нашем челлендже?",
+      "expected_keywords": ["main", "не мёржим", "отдельная ветка"],
+      "expected_source": "rules.md"
+    },
+    {
+      "q": "Какая HTTP-библиотека используется в нашем коде и почему не Retrofit?",
+      "expected_keywords": ["HttpClient", "JDK", "Retrofit", "OkHttp"],
+      "expected_source": "stack.md"
+    },
+    {
+      "q": "Какая embedding-модель и её размерность используется в дне 22?",
+      "expected_keywords": ["nomic-embed-text", "Ollama", "768"],
+      "expected_source": "rag-week5.md"
+    },
+    {
+      "q": "Что нужно сделать в PowerShell чтобы русский текст не превращался в кракозябры?",
+      "expected_keywords": ["chcp 65001", "OutputEncoding", "UTF8"],
+      "expected_source": "windows-setup.md"
+    },
+    {
+      "q": "Почему в day17 мы переключились с Open-Meteo на wttr.in?",
+      "expected_keywords": ["РФ", "timeout", "wttr.in", "User-Agent"],
+      "expected_source": "pitfalls.md"
+    },
+    {
+      "q": "В какую версию Kotlin пришлось прыгнуть чтобы MCP SDK 0.9.0 резолвился?",
+      "expected_keywords": ["2.1.20", "MCP SDK", "0.9.0"],
+      "expected_source": "pitfalls.md"
+    },
+    {
+      "q": "Куда сохраняется JSON-индекс дня 22 и что он содержит?",
+      "expected_keywords": [".ai-challenge", "day22_index.json", "чанки", "эмбеддинги"],
+      "expected_source": "env-and-state.md"
+    },
+    {
+      "q": "Какая тема у недели 4 и какая у недели 5?",
+      "expected_keywords": ["MCP", "Model Context Protocol", "RAG", "Retrieval"],
+      "expected_source": "weeks-plan.md"
+    },
+    {
+      "q": "Кто автор челленджа и в каком часовом поясе он живёт?",
+      "expected_keywords": ["Данил", "aldtoll", "Новосибирск", "UTC+7"],
+      "expected_source": "people.md"
+    },
+    {
+      "q": "Как правильно запускать модуль дня на Windows и почему не через ./gradlew?",
+      "expected_keywords": ["gradlew.bat", "PowerShell", "открыть файл"],
+      "expected_source": "windows-setup.md"
+    }
+  ]
+}
