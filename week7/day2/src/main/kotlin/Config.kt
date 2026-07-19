@@ -53,7 +53,7 @@ fun printHelp() = println(
 
       --diff <path>           файл с полным diff'ом PR (обычно pr.diff записывается workflow'ом)
       --changed <path>        (опц.) файл со списком изменённых путей, по одному в строке
-      --repo <path>           корень репозитория; default: $GITHUB_WORKSPACE или .
+      --repo <path>           корень репозитория; default: env GITHUB_WORKSPACE или .
 
     Env:
       DEEPSEEK_API_KEY        ключ DeepSeek (обязательно; в CI — из GitHub Secrets)
