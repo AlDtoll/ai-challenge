@@ -73,7 +73,8 @@ private fun readDotEnvKey(repoRoot: File, name: String): String? {
     )
     for (f in candidates) {
         if (!f.exists()) continue
-        f.forEachLine { line ->
+        // File.forEachLine — не inline, non-local return запрещён; используем for + readLines.
+        for (line in f.readLines()) {
             val t = line.trim()
             if (t.startsWith("$name=")) return t.substringAfter("=").trim().trim('"')
         }
