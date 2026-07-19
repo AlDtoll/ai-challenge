@@ -1,0 +1,29 @@
+[
+  {
+    "id": "u_101",
+    "name": "Данил Толмачев",
+    "email": "daniltclaude@gmail.com",
+    "plan": "PRO",
+    "tz": "Asia/Novosibirsk",
+    "created_at": "2024-11-03",
+    "notes": "Ранний адоптер. Активен в Kotlin-сегменте. Использует MCP-фичи через API."
+  },
+  {
+    "id": "u_102",
+    "name": "Александра Толмачева",
+    "email": "aleknock@example.com",
+    "plan": "FREE",
+    "tz": "Asia/Novosibirsk",
+    "created_at": "2025-04-12",
+    "notes": ".NET-разработчица. Оценивает продукт для команды из 4 человек. Ждёт SSO."
+  },
+  {
+    "id": "u_103",
+    "name": "Юрий Захаров",
+    "email": "yuri.z@example.com",
+    "plan": "TEAM",
+    "tz": "Europe/Moscow",
+    "created_at": "2025-01-08",
+    "notes": "Тимлид в SaaS-стартапе. Владелец билинга их аккаунта."
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "t_501",
+    "user_id": "u_101",
+    "status": "open",
+    "priority": "high",
+    "created_at": "2026-07-17T08:12:00+07:00",
+    "title": "Не приходит письмо для подтверждения email",
+    "description": "Пытаюсь сменить основной email на аккаунте. Нажимаю „сохранить“, но письмо не приходит ни на новый, ни на старый адрес. Проверил спам. Использую Gmail. Плана PRO.",
+    "tags": ["email", "auth", "confirmation"]
+  },
+  {
+    "id": "t_502",
+    "user_id": "u_102",
+    "status": "open",
+    "priority": "normal",
+    "created_at": "2026-07-18T14:03:00+07:00",
+    "title": "Как настроить SSO для команды из 4 человек?",
+    "description": "Смотрю ваш продукт для команды из 4 разработчиков (.NET). Нужен SSO через Google Workspace. Не могу найти документацию, есть ли эта фича на плане FREE или нужен TEAM/BUSINESS.",
+    "tags": ["sso", "team", "billing"]
+  },
+  {
+    "id": "t_503",
+    "user_id": "u_103",
+    "status": "waiting_reply",
+    "priority": "urgent",
+    "created_at": "2026-07-16T11:20:00+03:00",
+    "title": "Не работает интеграция MCP-сервера с нашей CI",
+    "description": "Настроили MCP-сервер по вашей документации, но при вызове tool `create_ticket` в CI-пайплайне падает 401 unauthorized. Локально из терминала работает. GitHub Actions с прямым access-токеном. Что не так?",
+    "tags": ["mcp", "auth", "ci"]
+  },
+  {
+    "id": "t_504",
+    "user_id": "u_101",
+    "status": "resolved",
+    "priority": "low",
+    "created_at": "2026-06-30T10:00:00+07:00",
+    "title": "Не могу изменить темп в редакторе",
+    "description": "На тарифе PRO не находится настройка темпа рендера в редакторе.",
+    "tags": ["editor", "settings"]
+  }
+]
