@@ -1,6 +1,7 @@
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO as ClientCIO
 import io.ktor.client.plugins.sse.SSE
@@ -173,17 +174,30 @@ private suspend fun runGoal(
     println("[достигнут лимит итераций ${cfg.maxToolIterations}, tool-calls=$toolCallsTotal]")
 }
 
-/** Переводим MCP-tools в схему DeepSeek (OpenAI-совместимую). */
+/** Переводим MCP-tools в схему DeepSeek (OpenAI-совместимую).
+ *
+ *  Осторожно: MCP `ToolSchema.properties` — это kotlinx.serialization.JsonObject.
+ *  Если скармливать его напрямую в `gson.toJsonTree`, gson не понимает kotlinx-типы
+ *  и сериализует `JsonPrimitive("str")` как `{isString:true, content:"str"}` —
+ *  DeepSeek такое ругает `Invalid schema for function ...`. Правильно —
+ *  через `.toString()` kotlinx (даёт валидный JSON), потом парсить gson-парсером.
+ */
 private fun toolsToDeepSeekSchema(tools: List<Tool>): JsonArray {
-    val gson = Gson()
     val arr = JsonArray()
     for (t in tools) {
-        // MCP inputSchema уже приходит в JSON-schema форме — заворачиваем в {"type":"function", ...}
-        val schemaJson = gson.toJsonTree(t.inputSchema).asJsonObject
+        val propsGson = JsonParser.parseString(t.inputSchema.properties.toString()).asJsonObject
+        val requiredGson = JsonArray().apply {
+            (t.inputSchema.required ?: emptyList()).forEach { add(it) }
+        }
+        val parameters = JsonObject().apply {
+            addProperty("type", "object")
+            add("properties", propsGson)
+            add("required", requiredGson)
+        }
         val fn = JsonObject().apply {
             addProperty("name", t.name)
             addProperty("description", t.description ?: "")
-            add("parameters", buildParametersFrom(schemaJson))
+            add("parameters", parameters)
         }
         val entry = JsonObject().apply {
             addProperty("type", "function")
@@ -192,16 +206,4 @@ private fun toolsToDeepSeekSchema(tools: List<Tool>): JsonArray {
         arr.add(entry)
     }
     return arr
-}
-
-/** MCP ToolSchema сериализуется в объект с полями properties/required.
- *  DeepSeek/OpenAI ждёт JSON-schema с полями type/properties/required. Обёртка простая. */
-private fun buildParametersFrom(schemaJson: JsonObject): JsonObject {
-    val out = JsonObject()
-    out.addProperty("type", "object")
-    val props = schemaJson.getAsJsonObject("properties") ?: JsonObject()
-    out.add("properties", props)
-    val required = schemaJson.get("required")?.asJsonArray ?: JsonArray()
-    out.add("required", required)
-    return out
 }
