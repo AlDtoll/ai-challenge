@@ -12,7 +12,7 @@ import kotlin.math.ln
 import kotlin.math.sqrt
 
 /**
- * RAG над корпусом FAQ (`data/faq/*.md`).
+ * RAG над корпусом FAQ (md-файлы в data/faq).
  *
  * Два режима, выбирается автоматически:
  *  • Ollama nomic-embed-text + cosine (как в day31). Если Ollama доступна — используем.
