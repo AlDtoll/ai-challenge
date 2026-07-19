@@ -93,7 +93,8 @@ private fun readDotEnvKey(name: String): String? {
 private fun readSecretsEnv(home: File, name: String): String? {
     val f = File(home, ".claude/env/secrets.env")
     if (!f.exists()) return null
-    f.forEachLine { line ->
+    // File.forEachLine — не inline, non-local return запрещён; for + readLines.
+    for (line in f.readLines()) {
         val t = line.trim()
         if (t.startsWith("$name=")) return t.substringAfter("=").trim().trim('"').trim('\'')
     }
