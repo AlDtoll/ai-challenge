@@ -79,7 +79,8 @@ private fun readDotEnvKey(name: String): String? {
     val candidates = listOf(File("../../.env"), File("../.env"), File(".env"))
     for (f in candidates) {
         if (!f.exists()) continue
-        f.forEachLine { line ->
+        // File.forEachLine — не inline, non-local return запрещён; используем for + readLines.
+        for (line in f.readLines()) {
             val t = line.trim()
             if (t.startsWith("$name=")) return t.substringAfter("=").trim().trim('"')
         }
