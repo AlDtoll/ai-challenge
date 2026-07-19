@@ -21,7 +21,7 @@ import kotlin.system.exitProcess
  *   REPL / help
  *     ├── всегда: MCP call get_current_branch (живой git-контекст)
  *     ├── router: если вопрос про git/файлы → git_status / git_log
- *     ├── RAG: cosine top-3 по README + docs/** проекта
+ *     ├── RAG: cosine top-3 по README + docs проекта
  *     └── DeepSeek chat с system-prompt-ассистента + собранным контекстом
  */
 fun main(args: Array<String>) = runBlocking<Unit> {

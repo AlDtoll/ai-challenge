@@ -11,7 +11,7 @@ import java.time.Duration
 import kotlin.math.sqrt
 
 /**
- * RAG-индекс над README.md + docs/** + CLAUDE.md проекта-донора.
+ * RAG-индекс над README.md + docs + CLAUDE.md проекта-донора.
  * Формат чанков совместим с week5/day22 и week6/day5 (та же схема).
  */
 
@@ -64,8 +64,8 @@ fun chunkMarkdown(text: String, size: Int = 800, overlap: Int = 150): List<Strin
 }
 
 /**
- * Читает README.md, все .md в docs/**, root CLAUDE.md.
- * Игнорирует .git, node_modules, build, .gradle, .idea, tmp, /tmp/**.
+ * Читает README.md, все .md в docs, root CLAUDE.md.
+ * Игнорирует .git, node_modules, build, .gradle, .idea, tmp, /tmp.
  */
 fun collectSourceFiles(root: File): List<File> {
     val allowedNames = setOf("README.md", "CLAUDE.md", "MEMORY.md")
