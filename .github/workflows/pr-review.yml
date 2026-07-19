@@ -1,0 +1,59 @@
+name: AI PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR HEAD
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Extract diff and changed files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr diff ${{ github.event.pull_request.number }} > pr.diff
+          gh pr view ${{ github.event.pull_request.number }} \
+            --json files --jq '.files[].path' > changed_files.txt
+          echo "----- diff head -----"
+          head -30 pr.diff || true
+          echo "----- changed files -----"
+          cat changed_files.txt
+
+      - name: Run AI reviewer
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          ./gradlew :week7:day2:run --args="--diff pr.diff --changed changed_files.txt" \
+            --console=plain --quiet 2>ai_review.stderr | tee ai_review.md
+          echo "----- stderr tail -----"
+          tail -20 ai_review.stderr || true
+
+      - name: Post review comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -s ai_review.md ]; then
+            gh pr comment ${{ github.event.pull_request.number }} --body-file ai_review.md
+          else
+            echo "AI-ревью пустое — пропускаю пост-комментарий."
+            exit 1
+          fi
