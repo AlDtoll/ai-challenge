@@ -7,7 +7,7 @@ import kotlin.system.exitProcess
  * Пайплайн (см. .github/workflows/pr-review.yml):
  *   1. GitHub Action на pull_request получает PR-diff → сохраняет в pr.diff и changed_files.txt.
  *   2. Запускает `gradle :week7:day2:run --args="--diff pr.diff --changed changed_files.txt"`.
- *   3. Этот main читает diff, строит BM25 индекс над README + docs/**, дёргает DeepSeek.
+ *   3. Этот main читает diff, строит BM25 индекс над README + docs, дёргает DeepSeek.
  *   4. Ревью печатается в stdout — workflow заберёт и запостит комментарием на PR.
  */
 fun main(args: Array<String>) {

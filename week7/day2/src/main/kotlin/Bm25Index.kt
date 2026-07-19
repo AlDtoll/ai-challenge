@@ -60,7 +60,7 @@ class Bm25Index(chunks: List<Chunk>, k1: Double = 1.5, b: Double = 0.75) {
 }
 
 /**
- * Сбор чанков из документации проекта: README + docs/**/*.md + верхнеуровневые
+ * Сбор чанков из документации проекта: README + docs/*.md + верхнеуровневые
  * *.md (CLAUDE.md/MEMORY.md, если есть). Каждый файл нарезается по абзацам с cap 1200 символов.
  */
 fun collectDocChunks(repoRoot: File, chunkSize: Int = 1200, overlap: Int = 150): List<Bm25Index.Chunk> {
