@@ -1,0 +1,35 @@
+{
+  "summary": {
+    "critical": 0,
+    "high": 2,
+    "medium": 1,
+    "low": 1,
+    "verdict": "BLOCK"
+  },
+  "issues": [
+    {
+      "severity": "High",
+      "line": 12,
+      "issue": "Hardcoded API key in source code (YOUR_API_KEY_HERE placeholder but pattern indicates secret in code).",
+      "fix": "Move API key to secure storage (e.g., Android Keystore or BuildConfig with proper obfuscation) and never hardcode secrets."
+    },
+    {
+      "severity": "High",
+      "line": 13,
+      "issue": "Cleartext HTTP URL (http://) used for API endpoint, allowing man-in-the-middle attacks and data interception.",
+      "fix": "Use HTTPS (https://) for all network requests and consider certificate pinning for sensitive endpoints."
+    },
+    {
+      "severity": "Medium",
+      "line": 20,
+      "issue": "No input validation on userId; potential path traversal or injection if userId contains special characters (e.g., '../').",
+      "fix": "Validate and sanitize userId (e.g., allow only alphanumeric characters) before concatenating into URL."
+    },
+    {
+      "severity": "Low",
+      "line": 28,
+      "issue": "Exception is silently swallowed, hiding network or parsing errors which may mask security issues.",
+      "fix": "Log or handle exceptions appropriately without exposing sensitive data."
+    }
+  ]
+}

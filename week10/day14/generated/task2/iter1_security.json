@@ -1,0 +1,35 @@
+{
+  "summary": {
+    "critical": 0,
+    "high": 3,
+    "medium": 1,
+    "low": 0,
+    "verdict": "BLOCK"
+  },
+  "issues": [
+    {
+      "severity": "High",
+      "line": 20,
+      "issue": "Logging request headers may expose sensitive tokens (e.g., Authorization, Cookie) in logcat.",
+      "fix": "Redact sensitive headers (e.g., Authorization, Cookie) before logging."
+    },
+    {
+      "severity": "High",
+      "line": 22,
+      "issue": "Logging request body may expose sensitive data (e.g., passwords, PII) in logcat.",
+      "fix": "Avoid logging request bodies or redact sensitive fields before logging."
+    },
+    {
+      "severity": "High",
+      "line": 34,
+      "issue": "Logging response body may expose sensitive data (e.g., tokens, PII) in logcat.",
+      "fix": "Avoid logging response bodies or redact sensitive fields before logging."
+    },
+    {
+      "severity": "Medium",
+      "line": 36,
+      "issue": "Logging response headers may expose sensitive data (e.g., Set-Cookie) in logcat.",
+      "fix": "Redact sensitive headers (e.g., Set-Cookie) before logging."
+    }
+  ]
+}

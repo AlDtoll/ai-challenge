@@ -1,0 +1,17 @@
+{
+  "summary": {
+    "critical": 0,
+    "high": 1,
+    "medium": 0,
+    "low": 0,
+    "verdict": "BLOCK"
+  },
+  "issues": [
+    {
+      "severity": "High",
+      "line": 6,
+      "issue": "Auth token stored in plain SharedPreferences without encryption, exposing sensitive credentials to attackers with device access or backups.",
+      "fix": "Use EncryptedSharedPreferences (androidx.security.crypto) with MasterKey to encrypt the token at rest."
+    }
+  ]
+}

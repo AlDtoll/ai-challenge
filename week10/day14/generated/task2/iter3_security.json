@@ -1,0 +1,35 @@
+{
+  "summary": {
+    "critical": 0,
+    "high": 0,
+    "medium": 2,
+    "low": 2,
+    "verdict": "WARN"
+  },
+  "issues": [
+    {
+      "severity": "Medium",
+      "line": 31,
+      "issue": "Request body is logged in plaintext when logBody is enabled, potentially exposing sensitive data (passwords, tokens, PII) in logcat.",
+      "fix": "Avoid logging request bodies by default, or redact sensitive fields before logging. Consider making logBody false in production builds."
+    },
+    {
+      "severity": "Medium",
+      "line": 48,
+      "issue": "Response body is logged in plaintext when logBody is enabled, potentially exposing sensitive data (tokens, PII, API responses) in logcat.",
+      "fix": "Avoid logging response bodies by default, or redact sensitive fields before logging. Consider making logBody false in production builds."
+    },
+    {
+      "severity": "Low",
+      "line": 25,
+      "issue": "Logging request headers (even redacted) may leak non-sensitive header names and values that could aid attackers in reconnaissance.",
+      "fix": "Consider logging only essential headers or disable header logging in production."
+    },
+    {
+      "severity": "Low",
+      "line": 44,
+      "issue": "Logging response headers may expose server information or internal details that could aid attackers.",
+      "fix": "Consider logging only essential headers or disable header logging in production."
+    }
+  ]
+}

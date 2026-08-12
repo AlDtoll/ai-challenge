@@ -1,0 +1,35 @@
+{
+  "summary": {
+    "critical": 0,
+    "high": 2,
+    "medium": 1,
+    "low": 1,
+    "verdict": "BLOCK"
+  },
+  "issues": [
+    {
+      "severity": "High",
+      "line": 8,
+      "issue": "Hardcoded API key in source code",
+      "fix": "Store the API key in a secure location such as Android Keystore or use BuildConfig with proper obfuscation, and avoid committing secrets to version control."
+    },
+    {
+      "severity": "High",
+      "line": 10,
+      "issue": "Cleartext HTTP connection used for API calls, exposing data to man-in-the-middle attacks",
+      "fix": "Use HTTPS instead of HTTP and consider implementing certificate pinning for sensitive endpoints."
+    },
+    {
+      "severity": "Medium",
+      "line": 10,
+      "issue": "User input (userId) is directly interpolated into the URL without validation or encoding, potentially allowing path traversal or injection attacks",
+      "fix": "Validate and sanitize userId, and use proper URL encoding (e.g., URLEncoder.encode) before constructing the URL."
+    },
+    {
+      "severity": "Low",
+      "line": 17,
+      "issue": "Exception is silently caught and null returned, which may hide security-relevant errors and make debugging difficult",
+      "fix": "Log the exception (without sensitive data) or handle it appropriately to aid in security monitoring."
+    }
+  ]
+}

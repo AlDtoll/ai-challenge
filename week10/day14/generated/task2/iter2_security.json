@@ -1,0 +1,35 @@
+{
+  "summary": {
+    "critical": 0,
+    "high": 2,
+    "medium": 1,
+    "low": 1,
+    "verdict": "BLOCK"
+  },
+  "issues": [
+    {
+      "severity": "High",
+      "line": 27,
+      "issue": "Request body is logged in cleartext via Log.d, potentially exposing sensitive data (e.g., passwords, tokens, PII) in logcat.",
+      "fix": "Remove request body logging or redact sensitive fields before logging; avoid logging full request bodies in production."
+    },
+    {
+      "severity": "High",
+      "line": 48,
+      "issue": "Response body is logged in cleartext via Log.d, potentially exposing sensitive data (e.g., tokens, PII, financial info) in logcat.",
+      "fix": "Remove response body logging or redact sensitive fields; only log metadata (status, headers) in production."
+    },
+    {
+      "severity": "Medium",
+      "line": 52,
+      "issue": "Response body is read and then reconstructed with ResponseBody.create, which may alter content type or encoding and could cause issues with binary data or large payloads.",
+      "fix": "Avoid reading and rebuilding the response body; use a logging interceptor like HttpLoggingInterceptor with proper redaction instead of manual body manipulation."
+    },
+    {
+      "severity": "Low",
+      "line": 10,
+      "issue": "The interceptor uses Log.d for all logging, which is verbose and may clutter logs; consider using a configurable logging level or conditional logging for debug builds only.",
+      "fix": "Gate logging behind BuildConfig.DEBUG or a configurable flag to avoid logging in production."
+    }
+  ]
+}

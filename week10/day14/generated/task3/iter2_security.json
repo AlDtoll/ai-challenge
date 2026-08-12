@@ -1,0 +1,29 @@
+{
+  "summary": {
+    "critical": 0,
+    "high": 1,
+    "medium": 1,
+    "low": 1,
+    "verdict": "BLOCK"
+  },
+  "issues": [
+    {
+      "severity": "High",
+      "line": 17,
+      "issue": "API key from BuildConfig is embedded in the app binary and can be extracted by reverse engineering, exposing sensitive credentials.",
+      "fix": "Move the API key to a secure backend proxy or use a runtime-provided token; avoid storing secrets in the client."
+    },
+    {
+      "severity": "Medium",
+      "line": 13,
+      "issue": "User-provided userId is directly interpolated into the URL without encoding, potentially allowing path traversal or injection of unexpected URL components.",
+      "fix": "URL-encode the userId parameter using URLEncoder.encode(userId, \"UTF-8\") or use HttpUrl builder with encoded path segments."
+    },
+    {
+      "severity": "Low",
+      "line": 24,
+      "issue": "Sensitive user profile data (including email) is parsed and returned without any explicit protection, and the response is not logged but could be exposed via debugging or memory dumps.",
+      "fix": "Ensure the profile data is handled securely, avoid logging it, and consider using encrypted storage if cached."
+    }
+  ]
+}

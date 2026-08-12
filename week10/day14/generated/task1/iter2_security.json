@@ -1,0 +1,17 @@
+{
+  "summary": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 1,
+    "verdict": "OK"
+  },
+  "issues": [
+    {
+      "severity": "Low",
+      "line": null,
+      "issue": "No explicit certificate pinning or network security configuration is present in the code, but this is a storage class and not directly related to network operations. The issue is informational only.",
+      "fix": "Ensure the app uses HTTPS and consider implementing certificate pinning for sensitive endpoints in the network layer."
+    }
+  ]
+}
