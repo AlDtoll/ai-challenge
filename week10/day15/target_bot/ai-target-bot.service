@@ -1,0 +1,20 @@
+[Unit]
+Description=AI Target Bot (Red Team target for AI Advent challenge)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=claudeuser
+Group=claudeuser
+WorkingDirectory=/home/claudeuser/sessions/common/workspace/ai_target_bot
+Environment=PATH=/home/claudeuser/.local/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/home/claudeuser/sessions/common/workspace/ai_target_bot/.env
+ExecStart=/home/claudeuser/.local/bin/uvicorn app.main:app --host 0.0.0.0 --port 8091
+Restart=always
+RestartSec=10
+MemoryMax=500M
+MemoryAccounting=yes
+
+[Install]
+WantedBy=multi-user.target

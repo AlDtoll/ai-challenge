@@ -1,0 +1,1 @@
+# Тесты AI Target Bot
